@@ -49,7 +49,15 @@ def command_builder(mock_binary):
             ["local", "s3", "s3compatible", "gcs", "azure_adls", "onelake"]
         )
         mock_detector.capabilities.publish_targets = frozenset(
-            ["snowflake", "databricks", "fabric", "bigquery", "motherduck", "glue", "ducklake"]
+            [
+                "snowflake",
+                "databricks",
+                "fabric",
+                "bigquery",
+                "motherduck",
+                "glue",
+                "ducklake",
+            ]
         )
         mock_detector.capabilities.compression_types = frozenset(
             ["Zstd", "Snappy", "Gzip", "Lz4", "None"]
@@ -606,5 +614,10 @@ class TestHelperFunctions:
         workflow = suggest_workflow("oracle", "azure_adls", "databricks")
 
         # Config create step should mention storage
-        config_step = next(s for s in workflow["steps"] if s["command"] == "config create")
-        assert "azure_adls" in config_step["example"] or "storage" in config_step["description"]
+        config_step = next(
+            s for s in workflow["steps"] if s["command"] == "config create"
+        )
+        assert (
+            "azure_adls" in config_step["example"]
+            or "storage" in config_step["description"]
+        )

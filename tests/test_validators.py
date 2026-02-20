@@ -258,7 +258,9 @@ class TestConfigCreateParams:
                 source_db_auth_id="source_db",
             )
         errors = exc_info.value.errors()
-        assert any("output_dir" in str(e) or "target_storage_id" in str(e) for e in errors)
+        assert any(
+            "output_dir" in str(e) or "target_storage_id" in str(e) for e in errors
+        )
 
     def test_publish_method_requires_publish_target(self):
         """Test that publish_method requires publish_target."""
@@ -324,7 +326,9 @@ class TestLogdbParams:
 
     def test_logdb_drop_confirm_true(self):
         """Test logdb drop with confirm=True."""
-        params = LogdbDropParams(auth_file="auth.json", log_db_auth_id="db", confirm=True)
+        params = LogdbDropParams(
+            auth_file="auth.json", log_db_auth_id="db", confirm=True
+        )
         assert params.confirm is True
 
     def test_logdb_truncate_optional_sync_id(self):
