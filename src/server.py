@@ -109,9 +109,18 @@ async def list_tools() -> list[Tool]:
                         "type": "object",
                         "description": "Parameters for logdb init",
                         "properties": {
-                            "auth_file": {"type": "string", "description": "Path to auth JSON file"},
-                            "log_db_auth_id": {"type": "string", "description": "Log database credential ID"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to auth JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -125,7 +134,10 @@ async def list_tools() -> list[Tool]:
                             "auth_file": {"type": "string"},
                             "log_db_auth_id": {"type": "string"},
                             "confirm": {"type": "boolean", "default": False},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -140,7 +152,10 @@ async def list_tools() -> list[Tool]:
                             "log_db_auth_id": {"type": "string"},
                             "sync_id": {"type": "string"},
                             "confirm": {"type": "boolean", "default": False},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -154,7 +169,10 @@ async def list_tools() -> list[Tool]:
                             "auth_file": {"type": "string"},
                             "log_db_auth_id": {"type": "string"},
                             "sync_id": {"type": "string"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -170,7 +188,10 @@ async def list_tools() -> list[Tool]:
                             "max_age_hours": {"type": "integer"},
                             "table_id": {"type": "string"},
                             "confirm": {"type": "boolean", "default": False},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -183,14 +204,26 @@ async def list_tools() -> list[Tool]:
                         "properties": {
                             "auth_file": {"type": "string"},
                             "log_db_auth_id": {"type": "string"},
-                            "source_db_auth_id": {"type": "string", "description": "Source database credential ID"},
+                            "source_db_auth_id": {
+                                "type": "string",
+                                "description": "Source database credential ID",
+                            },
                             "source_db_name": {"type": "string"},
                             "source_schema_name": {"type": "string"},
-                            "include": {"type": "string", "description": "Table include patterns"},
-                            "exclude": {"type": "string", "description": "Table exclude patterns"},
+                            "include": {
+                                "type": "string",
+                                "description": "Table include patterns",
+                            },
+                            "exclude": {
+                                "type": "string",
+                                "description": "Table exclude patterns",
+                            },
                             "min_rows": {"type": "integer"},
                             "max_rows": {"type": "integer"},
-                            "incremental_table": {"type": "array", "items": {"type": "string"}},
+                            "incremental_table": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
                             "incremental_safety_lag": {"type": "integer"},
                             "output_dir": {"type": "string"},
                             "target_storage_id": {"type": "string"},
@@ -198,11 +231,17 @@ async def list_tools() -> list[Tool]:
                             "fastbcp_dir_path": {"type": "string"},
                             "fastbcp_p": {"type": "integer"},
                             "n_jobs": {"type": "integer"},
-                            "compression_type": {"type": "string", "enum": [e.value for e in CompressionType]},
+                            "compression_type": {
+                                "type": "string",
+                                "enum": [e.value for e in CompressionType],
+                            },
                             "large_table_threshold": {"type": "integer"},
                             "fastbcp_table_config": {"type": "string"},
                             "publish_target": {"type": "string"},
-                            "publish_method": {"type": "string", "enum": [e.value for e in PublishMethod]},
+                            "publish_method": {
+                                "type": "string",
+                                "enum": [e.value for e in PublishMethod],
+                            },
                             "publish_database_name": {"type": "string"},
                             "publish_schema_pattern": {"type": "string"},
                             "publish_table_pattern": {"type": "string"},
@@ -211,14 +250,24 @@ async def list_tools() -> list[Tool]:
                             "generate_metadata": {"type": "boolean", "default": False},
                             "manifest_name": {"type": "string"},
                             "sync_id": {"type": "string"},
-                            "error_action": {"type": "string", "enum": [e.value for e in ErrorAction]},
+                            "error_action": {
+                                "type": "string",
+                                "enum": [e.value for e in ErrorAction],
+                            },
                             "env_name": {"type": "string"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
                         },
-                        "required": ["auth_file", "log_db_auth_id", "source_db_auth_id"],
+                        "required": [
+                            "auth_file",
+                            "log_db_auth_id",
+                            "source_db_auth_id",
+                        ],
                     },
                     "config_delete": {
                         "type": "object",
@@ -226,9 +275,15 @@ async def list_tools() -> list[Tool]:
                         "properties": {
                             "auth_file": {"type": "string"},
                             "log_db_auth_id": {"type": "string"},
-                            "sync_id": {"type": "string", "description": "The sync_id to delete"},
+                            "sync_id": {
+                                "type": "string",
+                                "description": "The sync_id to delete",
+                            },
                             "confirm": {"type": "boolean", "default": False},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -242,7 +297,10 @@ async def list_tools() -> list[Tool]:
                             "auth_file": {"type": "string"},
                             "log_db_auth_id": {"type": "string"},
                             "env_name": {"type": "string"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -258,7 +316,10 @@ async def list_tools() -> list[Tool]:
                             "run_id": {"type": "string"},
                             "auth_file": {"type": "string"},
                             "fastbcp_dir_path": {"type": "string"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -271,7 +332,10 @@ async def list_tools() -> list[Tool]:
                             "sync_id": {"type": "string"},
                             "auth_file": {"type": "string"},
                             "fastbcp_dir_path": {"type": "string"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -284,7 +348,10 @@ async def list_tools() -> list[Tool]:
                             "sync_id": {"type": "string"},
                             "run_id": {"type": "string"},
                             "auth_file": {"type": "string"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -294,10 +361,16 @@ async def list_tools() -> list[Tool]:
                         "type": "object",
                         "description": "Parameters for run",
                         "properties": {
-                            "config": {"type": "string", "description": "Path to YAML config file"},
+                            "config": {
+                                "type": "string",
+                                "description": "Path to YAML config file",
+                            },
                             "auth_file": {"type": "string"},
                             "log_db_auth_id": {"type": "string"},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -313,7 +386,10 @@ async def list_tools() -> list[Tool]:
                             "sync_id": {"type": "string"},
                             "run_id": {"type": "string"},
                             "verbose": {"type": "boolean", "default": False},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -326,11 +402,23 @@ async def list_tools() -> list[Tool]:
                         "properties": {
                             "auth_file": {"type": "string"},
                             "log_db_auth_id": {"type": "string"},
-                            "sync_id": {"type": "string", "description": "The sync_id to clean up"},
-                            "older_than": {"type": "string", "description": "Duration filter (e.g., 7d, 24h)"},
-                            "status": {"type": "string", "enum": [e.value for e in CleanupStatus]},
+                            "sync_id": {
+                                "type": "string",
+                                "description": "The sync_id to clean up",
+                            },
+                            "older_than": {
+                                "type": "string",
+                                "description": "Duration filter (e.g., 7d, 24h)",
+                            },
+                            "status": {
+                                "type": "string",
+                                "enum": [e.value for e in CleanupStatus],
+                            },
                             "dry_run": {"type": "boolean", "default": False},
-                            "log_level": {"type": "string", "enum": [e.value for e in LogLevel]},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                            },
                             "log_dir": {"type": "string"},
                             "no_progress": {"type": "boolean", "default": False},
                             "no_banner": {"type": "boolean", "default": False},
@@ -672,7 +760,9 @@ async def handle_validate_auth_file(arguments: Dict[str, Any]) -> list[TextConte
             f"**Entries**: {entry_count}",
         ]
         if required_auth_ids:
-            response.append(f"**Required auth_ids present**: {', '.join(required_auth_ids)}")
+            response.append(
+                f"**Required auth_ids present**: {', '.join(required_auth_ids)}"
+            )
 
     return [TextContent(type="text", text="\n".join(response))]
 
@@ -823,14 +913,18 @@ def _build_command_explanation(request: LakeXpressRequest) -> str:
 
     elif cmd == CommandType.LOGDB_DROP:
         parts.append("Drop the log database schema")
-        parts.append("WARNING: This will permanently delete all sync history and configuration")
+        parts.append(
+            "WARNING: This will permanently delete all sync history and configuration"
+        )
         if request.logdb_drop and request.logdb_drop.confirm:
             parts.append("Confirmation flag is set — operation will proceed")
 
     elif cmd == CommandType.LOGDB_TRUNCATE:
         parts.append("Clear all data from the log database while keeping the schema")
         if request.logdb_truncate and request.logdb_truncate.sync_id:
-            parts.append(f"Only data for sync_id '{request.logdb_truncate.sync_id}' will be cleared")
+            parts.append(
+                f"Only data for sync_id '{request.logdb_truncate.sync_id}' will be cleared"
+            )
 
     elif cmd == CommandType.LOGDB_LOCKS:
         parts.append("Show currently locked tables in the log database")
@@ -841,7 +935,9 @@ def _build_command_explanation(request: LakeXpressRequest) -> str:
         parts.append("Release stale or stuck table locks")
         if request.logdb_release_locks:
             if request.logdb_release_locks.max_age_hours is not None:
-                parts.append(f"Only locks older than {request.logdb_release_locks.max_age_hours} hours")
+                parts.append(
+                    f"Only locks older than {request.logdb_release_locks.max_age_hours} hours"
+                )
             if request.logdb_release_locks.table_id:
                 parts.append(f"For table_id: {request.logdb_release_locks.table_id}")
 
@@ -863,7 +959,9 @@ def _build_command_explanation(request: LakeXpressRequest) -> str:
             if p.compression_type:
                 parts.append(f"Compression: {p.compression_type.value}")
             if p.incremental_table:
-                parts.append(f"Incremental tables configured: {len(p.incremental_table)}")
+                parts.append(
+                    f"Incremental tables configured: {len(p.incremental_table)}"
+                )
 
     elif cmd == CommandType.CONFIG_DELETE:
         if request.config_delete:
@@ -910,7 +1008,9 @@ def _build_command_explanation(request: LakeXpressRequest) -> str:
 
     elif cmd == CommandType.CLEANUP:
         if request.cleanup:
-            parts.append(f"Clean up orphaned runs for sync_id: {request.cleanup.sync_id}")
+            parts.append(
+                f"Clean up orphaned runs for sync_id: {request.cleanup.sync_id}"
+            )
             if request.cleanup.older_than:
                 parts.append(f"Only runs older than: {request.cleanup.older_than}")
             if request.cleanup.status:

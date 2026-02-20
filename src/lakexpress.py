@@ -105,7 +105,9 @@ class CommandBuilder:
             raise LakeXpressError(f"LakeXpress path is not a file: {self.binary_path}")
 
         if not os.access(self.binary_path, os.X_OK):
-            raise LakeXpressError(f"LakeXpress binary is not executable: {self.binary_path}")
+            raise LakeXpressError(
+                f"LakeXpress binary is not executable: {self.binary_path}"
+            )
 
     def build_command(self, request: LakeXpressRequest) -> List[str]:
         """
@@ -120,15 +122,31 @@ class CommandBuilder:
         dispatch = {
             CommandType.LOGDB_INIT: lambda: self._build_logdb_init(request.logdb_init),
             CommandType.LOGDB_DROP: lambda: self._build_logdb_drop(request.logdb_drop),
-            CommandType.LOGDB_TRUNCATE: lambda: self._build_logdb_truncate(request.logdb_truncate),
-            CommandType.LOGDB_LOCKS: lambda: self._build_logdb_locks(request.logdb_locks),
-            CommandType.LOGDB_RELEASE_LOCKS: lambda: self._build_logdb_release_locks(request.logdb_release_locks),
-            CommandType.CONFIG_CREATE: lambda: self._build_config_create(request.config_create),
-            CommandType.CONFIG_DELETE: lambda: self._build_config_delete(request.config_delete),
-            CommandType.CONFIG_LIST: lambda: self._build_config_list(request.config_list),
+            CommandType.LOGDB_TRUNCATE: lambda: self._build_logdb_truncate(
+                request.logdb_truncate
+            ),
+            CommandType.LOGDB_LOCKS: lambda: self._build_logdb_locks(
+                request.logdb_locks
+            ),
+            CommandType.LOGDB_RELEASE_LOCKS: lambda: self._build_logdb_release_locks(
+                request.logdb_release_locks
+            ),
+            CommandType.CONFIG_CREATE: lambda: self._build_config_create(
+                request.config_create
+            ),
+            CommandType.CONFIG_DELETE: lambda: self._build_config_delete(
+                request.config_delete
+            ),
+            CommandType.CONFIG_LIST: lambda: self._build_config_list(
+                request.config_list
+            ),
             CommandType.SYNC: lambda: self._build_sync(request.sync),
-            CommandType.SYNC_EXPORT: lambda: self._build_sync_export(request.sync_export),
-            CommandType.SYNC_PUBLISH: lambda: self._build_sync_publish(request.sync_publish),
+            CommandType.SYNC_EXPORT: lambda: self._build_sync_export(
+                request.sync_export
+            ),
+            CommandType.SYNC_PUBLISH: lambda: self._build_sync_publish(
+                request.sync_publish
+            ),
             CommandType.RUN: lambda: self._build_run(request.run),
             CommandType.STATUS: lambda: self._build_status(request.status),
             CommandType.CLEANUP: lambda: self._build_cleanup(request.cleanup),
@@ -593,14 +611,16 @@ def suggest_workflow(
     steps = []
 
     # Step 1: Initialize log database (if first time)
-    steps.append({
-        "step": 1,
-        "command": "logdb init",
-        "description": "Initialize the log database schema (first-time setup only)",
-        "example": (
-            "LakeXpress logdb init -a auth.json --log_db_auth_id export_db"
-        ),
-    })
+    steps.append(
+        {
+            "step": 1,
+            "command": "logdb init",
+            "description": "Initialize the log database schema (first-time setup only)",
+            "example": (
+                "LakeXpress logdb init -a auth.json --log_db_auth_id export_db"
+            ),
+        }
+    )
 
     # Step 2: Create sync configuration
     config_desc = f"Create sync configuration for {source_type} source"
@@ -619,45 +639,55 @@ def suggest_workflow(
         config_example += f" --publish_target {publish_target}_target"
         config_desc += f" and {publish_target} publishing"
 
-    steps.append({
-        "step": 2,
-        "command": "config create",
-        "description": config_desc,
-        "example": config_example,
-    })
+    steps.append(
+        {
+            "step": 2,
+            "command": "config create",
+            "description": config_desc,
+            "example": config_example,
+        }
+    )
 
     # Step 3: Execute sync
     if publish_target:
-        steps.append({
-            "step": 3,
-            "command": "sync",
-            "description": "Execute full sync (export + publish)",
-            "example": "LakeXpress sync --sync_id <sync_id>",
-        })
-        steps.append({
-            "step": "3a",
-            "command": "sync[export] + sync[publish]",
-            "description": "Alternative: run export and publish separately",
-            "example": (
-                "LakeXpress 'sync[export]' --sync_id <sync_id>\n"
-                "LakeXpress 'sync[publish]' --sync_id <sync_id>"
-            ),
-        })
+        steps.append(
+            {
+                "step": 3,
+                "command": "sync",
+                "description": "Execute full sync (export + publish)",
+                "example": "LakeXpress sync --sync_id <sync_id>",
+            }
+        )
+        steps.append(
+            {
+                "step": "3a",
+                "command": "sync[export] + sync[publish]",
+                "description": "Alternative: run export and publish separately",
+                "example": (
+                    "LakeXpress 'sync[export]' --sync_id <sync_id>\n"
+                    "LakeXpress 'sync[publish]' --sync_id <sync_id>"
+                ),
+            }
+        )
     else:
-        steps.append({
-            "step": 3,
-            "command": "sync[export]",
-            "description": "Execute export only (no publishing target configured)",
-            "example": "LakeXpress 'sync[export]' --sync_id <sync_id>",
-        })
+        steps.append(
+            {
+                "step": 3,
+                "command": "sync[export]",
+                "description": "Execute export only (no publishing target configured)",
+                "example": "LakeXpress 'sync[export]' --sync_id <sync_id>",
+            }
+        )
 
     # Step 4: Check status
-    steps.append({
-        "step": 4,
-        "command": "status",
-        "description": "Check the status of the sync run",
-        "example": "LakeXpress status -a auth.json --log_db_auth_id export_db --sync_id <sync_id>",
-    })
+    steps.append(
+        {
+            "step": 4,
+            "command": "status",
+            "description": "Check the status of the sync run",
+            "example": "LakeXpress status -a auth.json --log_db_auth_id export_db --sync_id <sync_id>",
+        }
+    )
 
     return {
         "source_type": source_type,
