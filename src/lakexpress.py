@@ -119,44 +119,52 @@ class CommandBuilder:
         Returns:
             Command as list of strings (suitable for subprocess)
         """
-        dispatch = {
-            CommandType.LOGDB_INIT: lambda: self._build_logdb_init(request.logdb_init),
-            CommandType.LOGDB_DROP: lambda: self._build_logdb_drop(request.logdb_drop),
-            CommandType.LOGDB_TRUNCATE: lambda: self._build_logdb_truncate(
-                request.logdb_truncate
-            ),
-            CommandType.LOGDB_LOCKS: lambda: self._build_logdb_locks(
-                request.logdb_locks
-            ),
-            CommandType.LOGDB_RELEASE_LOCKS: lambda: self._build_logdb_release_locks(
-                request.logdb_release_locks
-            ),
-            CommandType.CONFIG_CREATE: lambda: self._build_config_create(
-                request.config_create
-            ),
-            CommandType.CONFIG_DELETE: lambda: self._build_config_delete(
-                request.config_delete
-            ),
-            CommandType.CONFIG_LIST: lambda: self._build_config_list(
-                request.config_list
-            ),
-            CommandType.SYNC: lambda: self._build_sync(request.sync),
-            CommandType.SYNC_EXPORT: lambda: self._build_sync_export(
-                request.sync_export
-            ),
-            CommandType.SYNC_PUBLISH: lambda: self._build_sync_publish(
-                request.sync_publish
-            ),
-            CommandType.RUN: lambda: self._build_run(request.run),
-            CommandType.STATUS: lambda: self._build_status(request.status),
-            CommandType.CLEANUP: lambda: self._build_cleanup(request.cleanup),
-        }
+        cmd = request.command
 
-        builder = dispatch.get(request.command)
-        if not builder:
-            raise LakeXpressError(f"Unknown command type: {request.command}")
-
-        return builder()
+        if cmd == CommandType.LOGDB_INIT:
+            assert request.logdb_init is not None
+            return self._build_logdb_init(request.logdb_init)
+        elif cmd == CommandType.LOGDB_DROP:
+            assert request.logdb_drop is not None
+            return self._build_logdb_drop(request.logdb_drop)
+        elif cmd == CommandType.LOGDB_TRUNCATE:
+            assert request.logdb_truncate is not None
+            return self._build_logdb_truncate(request.logdb_truncate)
+        elif cmd == CommandType.LOGDB_LOCKS:
+            assert request.logdb_locks is not None
+            return self._build_logdb_locks(request.logdb_locks)
+        elif cmd == CommandType.LOGDB_RELEASE_LOCKS:
+            assert request.logdb_release_locks is not None
+            return self._build_logdb_release_locks(request.logdb_release_locks)
+        elif cmd == CommandType.CONFIG_CREATE:
+            assert request.config_create is not None
+            return self._build_config_create(request.config_create)
+        elif cmd == CommandType.CONFIG_DELETE:
+            assert request.config_delete is not None
+            return self._build_config_delete(request.config_delete)
+        elif cmd == CommandType.CONFIG_LIST:
+            assert request.config_list is not None
+            return self._build_config_list(request.config_list)
+        elif cmd == CommandType.SYNC:
+            assert request.sync is not None
+            return self._build_sync(request.sync)
+        elif cmd == CommandType.SYNC_EXPORT:
+            assert request.sync_export is not None
+            return self._build_sync_export(request.sync_export)
+        elif cmd == CommandType.SYNC_PUBLISH:
+            assert request.sync_publish is not None
+            return self._build_sync_publish(request.sync_publish)
+        elif cmd == CommandType.RUN:
+            assert request.run is not None
+            return self._build_run(request.run)
+        elif cmd == CommandType.STATUS:
+            assert request.status is not None
+            return self._build_status(request.status)
+        elif cmd == CommandType.CLEANUP:
+            assert request.cleanup is not None
+            return self._build_cleanup(request.cleanup)
+        else:
+            raise LakeXpressError(f"Unknown command type: {cmd}")
 
     def _build_global_options(self, params) -> List[str]:
         """Build global option flags shared across most commands."""
