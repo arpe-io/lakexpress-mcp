@@ -46,3 +46,6 @@ Issues = "https://github.com/aetperf/lakexpress-mcp/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.ty.environment]
+python = "/home/francois/miniconda3/envs/py313/bin/python3"
