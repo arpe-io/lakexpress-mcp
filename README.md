@@ -1,6 +1,6 @@
-<!-- mcp-name: io.github.aetperf/lakexpress-mcp -->
-
 # LakeXpress MCP Server
+
+<!-- mcp-name: io.github.arpe-io/lakexpress-mcp -->
 
 A [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server for [LakeXpress](https://aetperf.github.io/LakeXpress-Documentation/) — a database to Parquet export tool with sync management and data lake publishing.
 
