@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lakexpress-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "A Model Context Protocol (MCP) server for LakeXpress, enabling database to Parquet export with sync management and data lake publishing."
 readme = "README.md"
 license = "MIT"
