@@ -41,8 +41,8 @@ lakexpress-mcp = "src.server:main"
 
 [project.urls]
 Homepage = "https://aetperf.github.io/LakeXpress-Documentation/"
-Repository = "https://github.com/aetperf/lakexpress-mcp"
-Issues = "https://github.com/aetperf/lakexpress-mcp/issues"
+Repository = "https://github.com/arpe-io/lakexpress-mcp"
+Issues = "https://github.com/arpe-io/lakexpress-mcp/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
