@@ -2,6 +2,10 @@
 
 <!-- mcp-name: io.github.arpe-io/lakexpress-mcp -->
 
+[![PyPI](https://img.shields.io/pypi/v/lakexpress-mcp)](https://pypi.org/project/lakexpress-mcp/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://registry.modelcontextprotocol.io/?q=arpe-io)
+
 A [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server for [LakeXpress](https://aetperf.github.io/LakeXpress-Documentation/) — a database to Parquet export tool with sync management and data lake publishing.
 
 ## Features
