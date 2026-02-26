@@ -36,6 +36,13 @@
           "name": "LAKEXPRESS_LOG_DIR"
         },
         {
+          "description": "Path to FastBCP binary directory (auto-fills fastbcp_dir_path parameter)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "FASTBCP_DIR_PATH"
+        },
+        {
           "description": "Logging level: DEBUG, INFO, WARNING, ERROR (default: INFO)",
           "format": "string",
           "name": "LOG_LEVEL"
