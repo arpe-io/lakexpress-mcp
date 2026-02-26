@@ -68,6 +68,7 @@ logger = logging.getLogger(__name__)
 LAKEXPRESS_PATH = os.getenv("LAKEXPRESS_PATH", "./LakeXpress")
 LAKEXPRESS_TIMEOUT = int(os.getenv("LAKEXPRESS_TIMEOUT", "3600"))
 LAKEXPRESS_LOG_DIR = Path(os.getenv("LAKEXPRESS_LOG_DIR", "./logs"))
+FASTBCP_DIR_PATH = os.getenv("FASTBCP_DIR_PATH", "")
 
 # Initialize MCP server
 app = Server("lakexpress")
@@ -556,6 +557,13 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
         ]
 
     try:
+        # Auto-fill fastbcp_dir_path from env var if not explicitly provided
+        if FASTBCP_DIR_PATH:
+            for key in ("config_create", "sync", "sync_export"):
+                sub = arguments.get(key)
+                if sub is not None and not sub.get("fastbcp_dir_path"):
+                    sub["fastbcp_dir_path"] = FASTBCP_DIR_PATH
+
         # Validate and parse request
         request = LakeXpressRequest(**arguments)
 
