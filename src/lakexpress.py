@@ -93,6 +93,7 @@ class CommandBuilder:
                 "supports_version_flag": caps.supports_version_flag,
                 "supports_incremental": caps.supports_incremental,
                 "supports_cleanup": caps.supports_cleanup,
+                "supports_quiet_fbcp": caps.supports_quiet_fbcp,
             },
         }
 
@@ -351,6 +352,8 @@ class CommandBuilder:
             cmd.extend(["-a", params.auth_file])
         if params.fastbcp_dir_path:
             cmd.extend(["--fastbcp_dir_path", params.fastbcp_dir_path])
+        if params.quiet_fbcp:
+            cmd.append("--quiet_fbcp")
         cmd.extend(self._build_common_options(params))
         return cmd
 
@@ -363,6 +366,8 @@ class CommandBuilder:
             cmd.extend(["-a", params.auth_file])
         if params.fastbcp_dir_path:
             cmd.extend(["--fastbcp_dir_path", params.fastbcp_dir_path])
+        if params.quiet_fbcp:
+            cmd.append("--quiet_fbcp")
         cmd.extend(self._build_common_options(params))
         return cmd
 
@@ -554,6 +559,7 @@ def get_supported_capabilities() -> Dict[str, Any]:
             "Oracle (oracle)",
             "MySQL (mysql)",
             "MariaDB (mariadb)",
+            "SAP HANA (saphana)",
         ],
         "Log Databases": [
             "SQL Server (sqlserver)",
