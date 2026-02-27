@@ -50,6 +50,7 @@ from src.lakexpress import (
     get_supported_capabilities,
     suggest_workflow,
 )
+from src.version import check_version_compatibility
 
 
 # Load environment variables
@@ -108,11 +109,11 @@ async def list_tools() -> list[Tool]:
                     },
                     "logdb_init": {
                         "type": "object",
-                        "description": "Parameters for logdb init",
+                        "description": "Initialize the log database schema. Creates required tables for sync management.",
                         "properties": {
                             "auth_file": {
                                 "type": "string",
-                                "description": "Path to auth JSON file",
+                                "description": "Path to authentication/credentials JSON file",
                             },
                             "log_db_auth_id": {
                                 "type": "string",
@@ -121,96 +122,208 @@ async def list_tools() -> list[Tool]:
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
                     "logdb_drop": {
                         "type": "object",
-                        "description": "Parameters for logdb drop",
+                        "description": "Drop the log database schema. WARNING: permanently deletes all sync history and configuration.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
                             "confirm": {"type": "boolean", "default": False},
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
                     "logdb_truncate": {
                         "type": "object",
-                        "description": "Parameters for logdb truncate",
+                        "description": "Clear all data from the log database while keeping the schema.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
-                            "sync_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "sync_id": {
+                                "type": "string",
+                                "description": "Truncate only data for this sync_id",
+                            },
                             "confirm": {"type": "boolean", "default": False},
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
                     "logdb_locks": {
                         "type": "object",
-                        "description": "Parameters for logdb locks",
+                        "description": "Show currently locked tables in the log database.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
-                            "sync_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "sync_id": {
+                                "type": "string",
+                                "description": "Show locks for this sync_id only",
+                            },
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
                     "logdb_release_locks": {
                         "type": "object",
-                        "description": "Parameters for logdb release-locks",
+                        "description": "Release stale or stuck table locks in the log database.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
-                            "max_age_hours": {"type": "integer"},
-                            "table_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "max_age_hours": {
+                                "type": "integer",
+                                "description": "Release locks older than this many hours",
+                            },
+                            "table_id": {
+                                "type": "string",
+                                "description": "Release lock for a specific table ID",
+                            },
                             "confirm": {"type": "boolean", "default": False},
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
                     "config_create": {
                         "type": "object",
-                        "description": "Parameters for config create",
+                        "description": (
+                            "Create a new sync configuration. Requires source DB credentials "
+                            "and either output_dir (local) or target_storage_id (cloud). "
+                            "Add publish_target for data lake publishing."
+                        ),
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
                             "source_db_auth_id": {
                                 "type": "string",
                                 "description": "Source database credential ID",
                             },
-                            "source_db_name": {"type": "string"},
-                            "source_schema_name": {"type": "string"},
+                            "source_db_name": {
+                                "type": "string",
+                                "description": "Source database name. Recommended: always specify explicitly to avoid relying on the credential default",
+                            },
+                            "source_schema_name": {
+                                "type": "string",
+                                "description": "Source schema(s), comma-separated. Supports wildcards (e.g., 'tpch_%'). If omitted, all schemas are exported",
+                            },
                             "include": {
                                 "type": "string",
                                 "description": "Table include patterns",
@@ -224,45 +337,121 @@ async def list_tools() -> list[Tool]:
                             "incremental_table": {
                                 "type": "array",
                                 "items": {"type": "string"},
+                                "description": "Incremental table configs. Format: 'schema.table:column:type[:i|:e][@start][!strategy]'",
                             },
-                            "incremental_safety_lag": {"type": "integer"},
-                            "output_dir": {"type": "string"},
-                            "target_storage_id": {"type": "string"},
-                            "sub_path": {"type": "string"},
-                            "fastbcp_dir_path": {"type": "string"},
-                            "fastbcp_p": {"type": "integer"},
-                            "n_jobs": {"type": "integer"},
+                            "incremental_safety_lag": {
+                                "type": "integer",
+                                "description": "Safety lag in seconds for incremental exports",
+                            },
+                            "output_dir": {
+                                "type": "string",
+                                "description": "Local output directory. Mutually exclusive with target_storage_id",
+                            },
+                            "target_storage_id": {
+                                "type": "string",
+                                "description": "Cloud storage credential ID. Mutually exclusive with output_dir",
+                            },
+                            "sub_path": {
+                                "type": "string",
+                                "description": "Sub-path within the storage location",
+                            },
+                            "fastbcp_dir_path": {
+                                "type": "string",
+                                "description": "Path to FastBCP binary directory (auto-filled from FASTBCP_DIR_PATH env var if not set)",
+                            },
+                            "fastbcp_p": {
+                                "type": "integer",
+                                "description": "FastBCP parallel degree (number of threads per table export)",
+                            },
+                            "n_jobs": {
+                                "type": "integer",
+                                "description": "Number of concurrent table exports",
+                            },
                             "compression_type": {
                                 "type": "string",
                                 "enum": [e.value for e in CompressionType],
+                                "description": "Parquet compression type",
                             },
-                            "large_table_threshold": {"type": "integer"},
-                            "fastbcp_table_config": {"type": "string"},
-                            "publish_target": {"type": "string"},
+                            "large_table_threshold": {
+                                "type": "integer",
+                                "description": "Row count threshold for large table handling",
+                            },
+                            "fastbcp_table_config": {
+                                "type": "string",
+                                "description": "Per-table FastBCP config. Format: 'table1:method:key:degree;table2:method:key:degree'",
+                            },
+                            "publish_target": {
+                                "type": "string",
+                                "description": "Publish target credential ID. Required when publish_method is set",
+                            },
                             "publish_method": {
                                 "type": "string",
                                 "enum": [e.value for e in PublishMethod],
+                                "description": "Publish method: 'external' (external tables) or 'internal' (loaded tables). Requires publish_target",
                             },
-                            "publish_database_name": {"type": "string"},
-                            "publish_schema_pattern": {"type": "string"},
-                            "publish_table_pattern": {"type": "string"},
-                            "no_views": {"type": "boolean", "default": False},
-                            "pk_constraints": {"type": "boolean", "default": False},
-                            "generate_metadata": {"type": "boolean", "default": False},
-                            "manifest_name": {"type": "string"},
-                            "sync_id": {"type": "string"},
+                            "publish_database_name": {
+                                "type": "string",
+                                "description": "Database name for publishing",
+                            },
+                            "publish_schema_pattern": {
+                                "type": "string",
+                                "description": "Schema naming pattern for publishing. Supports placeholders: {schema}, {subpath}, {date}",
+                            },
+                            "publish_table_pattern": {
+                                "type": "string",
+                                "description": "Table naming pattern for publishing. Supports placeholders: {schema}, {table}",
+                            },
+                            "no_views": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable view creation when publishing external tables",
+                            },
+                            "pk_constraints": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Enable primary key constraints when publishing",
+                            },
+                            "generate_metadata": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Generate CDM metadata files",
+                            },
+                            "manifest_name": {
+                                "type": "string",
+                                "description": "Manifest file name for metadata",
+                            },
+                            "sync_id": {
+                                "type": "string",
+                                "description": "Custom sync ID (1-64 chars, alphanumeric/underscore/hyphen)",
+                            },
                             "error_action": {
                                 "type": "string",
                                 "enum": [e.value for e in ErrorAction],
+                                "description": "Action on table export error: fail (stop), continue (skip and continue), skip",
                             },
-                            "env_name": {"type": "string"},
+                            "env_name": {
+                                "type": "string",
+                                "description": "Environment name for configuration isolation",
+                            },
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": [
                             "auth_file",
@@ -272,10 +461,16 @@ async def list_tools() -> list[Tool]:
                     },
                     "config_delete": {
                         "type": "object",
-                        "description": "Parameters for config delete",
+                        "description": "Delete a sync configuration.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
                             "sync_id": {
                                 "type": "string",
                                 "description": "The sync_id to delete",
@@ -284,147 +479,319 @@ async def list_tools() -> list[Tool]:
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id", "sync_id"],
                     },
                     "config_list": {
                         "type": "object",
-                        "description": "Parameters for config list",
+                        "description": "List all sync configurations.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
-                            "env_name": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "env_name": {
+                                "type": "string",
+                                "description": "Environment name for configuration isolation",
+                            },
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
                     "sync": {
                         "type": "object",
-                        "description": "Parameters for sync",
+                        "description": "Run a full sync (export + publish). Exports data and publishes if configured.",
                         "properties": {
-                            "sync_id": {"type": "string"},
-                            "resume": {"type": "boolean", "default": False},
-                            "run_id": {"type": "string"},
-                            "auth_file": {"type": "string"},
-                            "fastbcp_dir_path": {"type": "string"},
+                            "sync_id": {
+                                "type": "string",
+                                "description": "The sync_id to execute. If omitted, uses the last created config",
+                            },
+                            "resume": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Resume an incomplete or failed run",
+                            },
+                            "run_id": {
+                                "type": "string",
+                                "description": "Specific run_id to resume",
+                            },
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "fastbcp_dir_path": {
+                                "type": "string",
+                                "description": "Path to FastBCP binary directory (auto-filled from FASTBCP_DIR_PATH env var if not set)",
+                            },
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
-                            "quiet_fbcp": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
+                            "quiet_fbcp": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress FastBCP console output (requires LakeXpress 0.2.9+)",
+                            },
                         },
                     },
                     "sync_export": {
                         "type": "object",
-                        "description": "Parameters for sync[export]",
+                        "description": "Run export-only sync (no publish). Exports data to local or cloud storage.",
                         "properties": {
-                            "sync_id": {"type": "string"},
-                            "auth_file": {"type": "string"},
-                            "fastbcp_dir_path": {"type": "string"},
+                            "sync_id": {
+                                "type": "string",
+                                "description": "The sync_id to export. If omitted, uses the last created config",
+                            },
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "fastbcp_dir_path": {
+                                "type": "string",
+                                "description": "Path to FastBCP binary directory (auto-filled from FASTBCP_DIR_PATH env var if not set)",
+                            },
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
-                            "quiet_fbcp": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
+                            "quiet_fbcp": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress FastBCP console output (requires LakeXpress 0.2.9+)",
+                            },
                         },
                     },
                     "sync_publish": {
                         "type": "object",
-                        "description": "Parameters for sync[publish]",
+                        "description": "Run publish-only sync. Publishes previously exported data to the configured target.",
                         "properties": {
-                            "sync_id": {"type": "string"},
-                            "run_id": {"type": "string"},
-                            "auth_file": {"type": "string"},
+                            "sync_id": {
+                                "type": "string",
+                                "description": "The sync_id to publish. If omitted, uses the last created config",
+                            },
+                            "run_id": {
+                                "type": "string",
+                                "description": "Specific run_id to publish",
+                            },
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                     },
                     "run": {
                         "type": "object",
-                        "description": "Parameters for run",
+                        "description": "Run a multi-step pipeline from a YAML config file.",
                         "properties": {
                             "config": {
                                 "type": "string",
                                 "description": "Path to YAML config file",
                             },
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["config"],
                     },
                     "status": {
                         "type": "object",
-                        "description": "Parameters for status",
+                        "description": "Show sync run status and history.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
-                            "sync_id": {"type": "string"},
-                            "run_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "sync_id": {
+                                "type": "string",
+                                "description": "Show runs for this sync configuration",
+                            },
+                            "run_id": {
+                                "type": "string",
+                                "description": "Show details for a specific run",
+                            },
                             "verbose": {"type": "boolean", "default": False},
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
                     "cleanup": {
                         "type": "object",
-                        "description": "Parameters for cleanup",
+                        "description": "Clean up old or failed sync runs.",
                         "properties": {
-                            "auth_file": {"type": "string"},
-                            "log_db_auth_id": {"type": "string"},
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
                             "sync_id": {
                                 "type": "string",
                                 "description": "The sync_id to clean up",
                             },
                             "older_than": {
                                 "type": "string",
-                                "description": "Duration filter (e.g., 7d, 24h)",
+                                "description": "Duration filter, e.g., 7d, 24h, 30m",
                             },
                             "status": {
                                 "type": "string",
                                 "enum": [e.value for e in CleanupStatus],
+                                "description": "Only delete runs with this status",
                             },
                             "dry_run": {"type": "boolean", "default": False},
                             "log_level": {
                                 "type": "string",
                                 "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
                             },
-                            "log_dir": {"type": "string"},
-                            "no_progress": {"type": "boolean", "default": False},
-                            "no_banner": {"type": "boolean", "default": False},
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
                         },
                         "required": ["auth_file", "log_db_auth_id", "sync_id"],
                     },
@@ -569,6 +936,16 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
         # Validate and parse request
         request = LakeXpressRequest(**arguments)
 
+        # Check version compatibility
+        cmd_type = arguments.get("command", "")
+        cmd_params = arguments.get(cmd_type, {}) or {}
+        version_warnings = check_version_compatibility(
+            cmd_type,
+            cmd_params,
+            command_builder.version_detector.capabilities,
+            command_builder.version_detector._detected_version,
+        )
+
         # Build command
         command = command_builder.build_command(request)
 
@@ -584,6 +961,15 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
             "",
             "## What this command will do:",
             explanation,
+        ]
+
+        if version_warnings:
+            response.append("")
+            response.append("## \u26a0 Version Compatibility Warnings")
+            for warning in version_warnings:
+                response.append(f"- {warning}")
+
+        response += [
             "",
             "## Command:",
             "```bash",
