@@ -35,8 +35,8 @@ class TestCommandType:
     """Tests for CommandType enum."""
 
     def test_all_14_command_types(self):
-        """Test that there are exactly 14 command types."""
-        assert len(CommandType) == 14
+        """Test that there are exactly 19 command types."""
+        assert len(CommandType) == 19
 
     def test_logdb_commands_exist(self):
         """Test logdb command types exist."""

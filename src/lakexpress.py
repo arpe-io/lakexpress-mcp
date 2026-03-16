@@ -51,23 +51,35 @@ class CommandBuilder:
 
         Args:
             binary_path: Path to the LakeXpress binary
-
-        Raises:
-            LakeXpressError: If binary doesn't exist or isn't executable
         """
         self.binary_path = Path(binary_path)
+        self._preview_only = False
         self._validate_binary()
-        self._version_detector = VersionDetector(str(self.binary_path))
-        detected = self._version_detector.detect()
-        if detected:
-            logger.info(f"LakeXpress version {detected} detected")
+        if self._preview_only:
+            # Skip version detection; VersionDetector will fall back to
+            # latest known capabilities when detect() returns None.
+            self._version_detector = VersionDetector(str(self.binary_path))
+            logger.info(
+                "LakeXpress running in preview-only mode "
+                "(binary not found, command preview and info tools still available)"
+            )
         else:
-            logger.warning("Could not detect LakeXpress version")
+            self._version_detector = VersionDetector(str(self.binary_path))
+            detected = self._version_detector.detect()
+            if detected:
+                logger.info(f"LakeXpress version {detected} detected")
+            else:
+                logger.warning("Could not detect LakeXpress version")
 
     @property
     def version_detector(self) -> VersionDetector:
         """Access the version detector instance."""
         return self._version_detector
+
+    @property
+    def preview_only(self) -> bool:
+        """Whether the server is running in preview-only mode (binary not found)."""
+        return self._preview_only
 
     def get_version(self) -> Dict[str, Any]:
         """Get version information and capabilities.
@@ -75,12 +87,41 @@ class CommandBuilder:
         Returns:
             Dict with version string, detection status, binary path, and capabilities.
         """
+        if self._preview_only:
+            # Use latest known capabilities as fallback
+            caps = self._version_detector.capabilities
+            return {
+                "version": None,
+                "detected": False,
+                "preview_only": True,
+                "binary_path": str(self.binary_path),
+                "message": "Binary not found. Install from https://arpe.io",
+                "capabilities": {
+                    "source_databases": sorted(caps.source_databases),
+                    "log_databases": sorted(caps.log_databases),
+                    "storage_backends": sorted(caps.storage_backends),
+                    "publish_targets": sorted(caps.publish_targets),
+                    "compression_types": sorted(caps.compression_types),
+                    "commands": sorted(caps.commands),
+                    "supports_no_banner": caps.supports_no_banner,
+                    "supports_version_flag": caps.supports_version_flag,
+                    "supports_incremental": caps.supports_incremental,
+                    "supports_cleanup": caps.supports_cleanup,
+                    "supports_quiet_fbcp": caps.supports_quiet_fbcp,
+                    "supports_no_progress": caps.supports_no_progress,
+                    "supports_resume": caps.supports_resume,
+                    "supports_license": caps.supports_license,
+                    "supports_env_name": caps.supports_env_name,
+                },
+            }
+
         detected = self._version_detector.detect()
         caps = self._version_detector.capabilities
 
         return {
             "version": str(detected) if detected else None,
             "detected": detected is not None,
+            "preview_only": False,
             "binary_path": str(self.binary_path),
             "capabilities": {
                 "source_databases": sorted(caps.source_databases),
@@ -94,21 +135,43 @@ class CommandBuilder:
                 "supports_incremental": caps.supports_incremental,
                 "supports_cleanup": caps.supports_cleanup,
                 "supports_quiet_fbcp": caps.supports_quiet_fbcp,
+                "supports_no_progress": caps.supports_no_progress,
+                "supports_resume": caps.supports_resume,
+                "supports_license": caps.supports_license,
+                "supports_env_name": caps.supports_env_name,
             },
         }
 
     def _validate_binary(self) -> None:
-        """Validate that LakeXpress binary exists and is executable."""
+        """Validate that LakeXpress binary exists and is executable.
+
+        If the binary is not found or not usable, sets preview-only mode
+        instead of raising an exception, allowing the server to continue
+        serving preview and informational tools.
+        """
         if not self.binary_path.exists():
-            raise LakeXpressError(f"LakeXpress binary not found at: {self.binary_path}")
+            logger.warning(
+                f"LakeXpress binary not found at: {self.binary_path} "
+                "- entering preview-only mode"
+            )
+            self._preview_only = True
+            return
 
         if not self.binary_path.is_file():
-            raise LakeXpressError(f"LakeXpress path is not a file: {self.binary_path}")
+            logger.warning(
+                f"LakeXpress path is not a file: {self.binary_path} "
+                "- entering preview-only mode"
+            )
+            self._preview_only = True
+            return
 
         if not os.access(self.binary_path, os.X_OK):
-            raise LakeXpressError(
-                f"LakeXpress binary is not executable: {self.binary_path}"
+            logger.warning(
+                f"LakeXpress binary is not executable: {self.binary_path} "
+                "- entering preview-only mode"
             )
+            self._preview_only = True
+            return
 
     def build_command(self, request: LakeXpressRequest) -> List[str]:
         """
@@ -137,6 +200,21 @@ class CommandBuilder:
         elif cmd == CommandType.LOGDB_RELEASE_LOCKS:
             assert request.logdb_release_locks is not None
             return self._build_logdb_release_locks(request.logdb_release_locks)
+        elif cmd == CommandType.LXDB_INIT:
+            assert request.lxdb_init is not None
+            return self._build_lxdb_init(request.lxdb_init)
+        elif cmd == CommandType.LXDB_DROP:
+            assert request.lxdb_drop is not None
+            return self._build_lxdb_drop(request.lxdb_drop)
+        elif cmd == CommandType.LXDB_TRUNCATE:
+            assert request.lxdb_truncate is not None
+            return self._build_lxdb_truncate(request.lxdb_truncate)
+        elif cmd == CommandType.LXDB_LOCKS:
+            assert request.lxdb_locks is not None
+            return self._build_lxdb_locks(request.lxdb_locks)
+        elif cmd == CommandType.LXDB_RELEASE_LOCKS:
+            assert request.lxdb_release_locks is not None
+            return self._build_lxdb_release_locks(request.lxdb_release_locks)
         elif cmd == CommandType.CONFIG_CREATE:
             assert request.config_create is not None
             return self._build_config_create(request.config_create)
@@ -180,6 +258,8 @@ class CommandBuilder:
             args.append("--no_progress")
         if params.no_banner:
             args.append("--no_banner")
+        if getattr(params, "license", None):
+            args.extend(["--license", params.license])
         return args
 
     def _build_common_options(self, params) -> List[str]:
@@ -193,6 +273,10 @@ class CommandBuilder:
             args.append("--no_progress")
         if params.no_banner:
             args.append("--no_banner")
+        if getattr(params, "license", None):
+            args.extend(["--license", params.license])
+        if getattr(params, "env_name", None):
+            args.extend(["--env_name", params.env_name])
         return args
 
     def _build_logdb_init(self, params: LogdbInitParams) -> List[str]:
@@ -230,6 +314,50 @@ class CommandBuilder:
     def _build_logdb_release_locks(self, params: LogdbReleaseLocksParams) -> List[str]:
         """Build logdb release-locks command."""
         cmd = [str(self.binary_path), "logdb", "release-locks"]
+        cmd.extend(self._build_global_options(params))
+        if params.max_age_hours is not None:
+            cmd.extend(["--max_age_hours", str(params.max_age_hours)])
+        if params.table_id:
+            cmd.extend(["--table_id", params.table_id])
+        if params.confirm:
+            cmd.append("--confirm")
+        return cmd
+
+    def _build_lxdb_init(self, params: LogdbInitParams) -> List[str]:
+        """Build lxdb init command (0.3.0+)."""
+        cmd = [str(self.binary_path), "lxdb", "init"]
+        cmd.extend(self._build_global_options(params))
+        return cmd
+
+    def _build_lxdb_drop(self, params: LogdbDropParams) -> List[str]:
+        """Build lxdb drop command (0.3.0+)."""
+        cmd = [str(self.binary_path), "lxdb", "drop"]
+        cmd.extend(self._build_global_options(params))
+        if params.confirm:
+            cmd.append("--confirm")
+        return cmd
+
+    def _build_lxdb_truncate(self, params: LogdbTruncateParams) -> List[str]:
+        """Build lxdb truncate command (0.3.0+)."""
+        cmd = [str(self.binary_path), "lxdb", "truncate"]
+        cmd.extend(self._build_global_options(params))
+        if params.sync_id:
+            cmd.extend(["--sync_id", params.sync_id])
+        if params.confirm:
+            cmd.append("--confirm")
+        return cmd
+
+    def _build_lxdb_locks(self, params: LogdbLocksParams) -> List[str]:
+        """Build lxdb locks command (0.3.0+)."""
+        cmd = [str(self.binary_path), "lxdb", "locks"]
+        cmd.extend(self._build_global_options(params))
+        if params.sync_id:
+            cmd.extend(["--sync_id", params.sync_id])
+        return cmd
+
+    def _build_lxdb_release_locks(self, params: LogdbReleaseLocksParams) -> List[str]:
+        """Build lxdb release-locks command (0.3.0+)."""
+        cmd = [str(self.binary_path), "lxdb", "release-locks"]
         cmd.extend(self._build_global_options(params))
         if params.max_age_hours is not None:
             cmd.extend(["--max_age_hours", str(params.max_age_hours)])
@@ -470,9 +598,15 @@ class CommandBuilder:
             Tuple of (return_code, stdout, stderr)
 
         Raises:
+            LakeXpressError: If in preview-only mode or execution fails
             subprocess.TimeoutExpired: If execution exceeds timeout
-            LakeXpressError: If execution fails
         """
+        if self._preview_only:
+            raise LakeXpressError(
+                f"Server is in preview-only mode (binary not found at {self.binary_path}). "
+                "Install the binary from https://arpe.io to enable execution."
+            )
+
         start_time = datetime.now()
 
         logger.info(f"Executing LakeXpress command: {' '.join(command)}")
@@ -588,11 +722,16 @@ def get_supported_capabilities() -> Dict[str, Any]:
         ],
         "Compression Types": ["Zstd", "Snappy", "Gzip", "Lz4", "None"],
         "Commands": {
-            "logdb init": "Create the log database schema",
-            "logdb drop": "Drop the log database schema",
-            "logdb truncate": "Clear all data, keep schema",
-            "logdb locks": "Show currently locked tables",
-            "logdb release-locks": "Release stale or stuck locks",
+            "logdb init": "Create the log database schema (pre-0.3.0)",
+            "logdb drop": "Drop the log database schema (pre-0.3.0)",
+            "logdb truncate": "Clear all data, keep schema (pre-0.3.0)",
+            "logdb locks": "Show currently locked tables (pre-0.3.0)",
+            "logdb release-locks": "Release stale or stuck locks (pre-0.3.0)",
+            "lxdb init": "Create the log database schema (0.3.0+)",
+            "lxdb drop": "Drop the log database schema (0.3.0+)",
+            "lxdb truncate": "Clear all data, keep schema (0.3.0+)",
+            "lxdb locks": "Show currently locked tables (0.3.0+)",
+            "lxdb release-locks": "Release stale or stuck locks (0.3.0+)",
             "config create": "Create a new sync configuration",
             "config delete": "Delete an existing sync configuration",
             "config list": "List all sync configurations",

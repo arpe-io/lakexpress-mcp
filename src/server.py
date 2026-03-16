@@ -78,12 +78,19 @@ app = Server("lakexpress")
 try:
     command_builder = CommandBuilder(LAKEXPRESS_PATH)
     version_info = command_builder.get_version()
-    logger.info(f"LakeXpress binary found at: {LAKEXPRESS_PATH}")
-    if version_info["detected"]:
-        logger.info(f"LakeXpress version: {version_info['version']}")
+    if command_builder.preview_only:
+        logger.warning(
+            "LakeXpress server started in PREVIEW-ONLY mode. "
+            "Preview and informational tools are available, but execution is disabled. "
+            "Install the binary from https://arpe.io to enable execution."
+        )
     else:
-        logger.warning("LakeXpress version could not be detected")
-except LakeXpressError as e:
+        logger.info(f"LakeXpress binary found at: {LAKEXPRESS_PATH}")
+        if version_info["detected"]:
+            logger.info(f"LakeXpress version: {version_info['version']}")
+        else:
+            logger.warning("LakeXpress version could not be detected")
+except Exception as e:
     logger.error(f"Failed to initialize CommandBuilder: {e}")
     command_builder = None
 
@@ -296,6 +303,215 @@ async def list_tools() -> list[Tool]:
                         },
                         "required": ["auth_file", "log_db_auth_id"],
                     },
+                    "lxdb_init": {
+                        "type": "object",
+                        "description": "Initialize the log database schema (0.3.0+ replacement for logdb_init).",
+                        "properties": {
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
+                            },
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                        },
+                        "required": ["auth_file", "log_db_auth_id"],
+                    },
+                    "lxdb_drop": {
+                        "type": "object",
+                        "description": "Drop the log database schema (0.3.0+ replacement for logdb_drop). WARNING: permanently deletes all sync history.",
+                        "properties": {
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "confirm": {"type": "boolean", "default": False},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
+                            },
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                        },
+                        "required": ["auth_file", "log_db_auth_id"],
+                    },
+                    "lxdb_truncate": {
+                        "type": "object",
+                        "description": "Clear all data from the log database while keeping the schema (0.3.0+ replacement for logdb_truncate).",
+                        "properties": {
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "sync_id": {
+                                "type": "string",
+                                "description": "Truncate only data for this sync_id",
+                            },
+                            "confirm": {"type": "boolean", "default": False},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
+                            },
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                        },
+                        "required": ["auth_file", "log_db_auth_id"],
+                    },
+                    "lxdb_locks": {
+                        "type": "object",
+                        "description": "Show currently locked tables in the log database (0.3.0+ replacement for logdb_locks).",
+                        "properties": {
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "sync_id": {
+                                "type": "string",
+                                "description": "Show locks for this sync_id only",
+                            },
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
+                            },
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                        },
+                        "required": ["auth_file", "log_db_auth_id"],
+                    },
+                    "lxdb_release_locks": {
+                        "type": "object",
+                        "description": "Release stale or stuck table locks (0.3.0+ replacement for logdb_release_locks).",
+                        "properties": {
+                            "auth_file": {
+                                "type": "string",
+                                "description": "Path to authentication/credentials JSON file",
+                            },
+                            "log_db_auth_id": {
+                                "type": "string",
+                                "description": "Log database credential ID",
+                            },
+                            "max_age_hours": {
+                                "type": "integer",
+                                "description": "Release locks older than this many hours",
+                            },
+                            "table_id": {
+                                "type": "string",
+                                "description": "Release lock for a specific table ID",
+                            },
+                            "confirm": {"type": "boolean", "default": False},
+                            "log_level": {
+                                "type": "string",
+                                "enum": [e.value for e in LogLevel],
+                                "description": "Logging verbosity level",
+                            },
+                            "log_dir": {
+                                "type": "string",
+                                "description": "Directory for log files",
+                            },
+                            "no_progress": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Disable progress bar display",
+                            },
+                            "no_banner": {
+                                "type": "boolean",
+                                "default": False,
+                                "description": "Suppress the startup banner",
+                            },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                        },
+                        "required": ["auth_file", "log_db_auth_id"],
+                    },
                     "config_create": {
                         "type": "object",
                         "description": (
@@ -452,6 +668,10 @@ async def list_tools() -> list[Tool]:
                                 "default": False,
                                 "description": "Suppress the startup banner",
                             },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
                         },
                         "required": [
                             "auth_file",
@@ -585,6 +805,14 @@ async def list_tools() -> list[Tool]:
                                 "default": False,
                                 "description": "Suppress FastBCP console output (requires LakeXpress 0.2.9+)",
                             },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                            "env_name": {
+                                "type": "string",
+                                "description": "Environment name for configuration isolation (0.3.0+)",
+                            },
                         },
                     },
                     "sync_export": {
@@ -627,6 +855,14 @@ async def list_tools() -> list[Tool]:
                                 "default": False,
                                 "description": "Suppress FastBCP console output (requires LakeXpress 0.2.9+)",
                             },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                            "env_name": {
+                                "type": "string",
+                                "description": "Environment name for configuration isolation (0.3.0+)",
+                            },
                         },
                     },
                     "sync_publish": {
@@ -664,6 +900,14 @@ async def list_tools() -> list[Tool]:
                                 "default": False,
                                 "description": "Suppress the startup banner",
                             },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                            "env_name": {
+                                "type": "string",
+                                "description": "Environment name for configuration isolation (0.3.0+)",
+                            },
                         },
                     },
                     "run": {
@@ -700,6 +944,14 @@ async def list_tools() -> list[Tool]:
                                 "type": "boolean",
                                 "default": False,
                                 "description": "Suppress the startup banner",
+                            },
+                            "license": {
+                                "type": "string",
+                                "description": "Path to license file (0.3.0+)",
+                            },
+                            "env_name": {
+                                "type": "string",
+                                "description": "Environment name for configuration isolation (0.3.0+)",
                             },
                         },
                         "required": ["config"],
@@ -918,8 +1170,8 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
             TextContent(
                 type="text",
                 text=(
-                    "Error: LakeXpress binary not found or not accessible.\n"
-                    f"Expected location: {LAKEXPRESS_PATH}\n"
+                    "Error: LakeXpress server failed to initialize.\n"
+                    f"Expected binary location: {LAKEXPRESS_PATH}\n"
                     "Please set LAKEXPRESS_PATH environment variable correctly."
                 ),
             )
@@ -959,13 +1211,24 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
         response = [
             "# LakeXpress Command Preview",
             "",
+        ]
+
+        if command_builder.preview_only:
+            response += [
+                "**NOTE: Server is in preview-only mode** (binary not found at "
+                f"`{LAKEXPRESS_PATH}`). Command preview is available but execution "
+                "is disabled. Install the binary from https://arpe.io to enable execution.",
+                "",
+            ]
+
+        response += [
             "## What this command will do:",
             explanation,
         ]
 
         if version_warnings:
             response.append("")
-            response.append("## \u26a0 Version Compatibility Warnings")
+            response.append("## Version Compatibility Warnings")
             for warning in version_warnings:
                 response.append(f"- {warning}")
 
@@ -1011,7 +1274,18 @@ async def handle_execute_command(arguments: Dict[str, Any]) -> list[TextContent]
         return [
             TextContent(
                 type="text",
-                text="Error: LakeXpress binary not found. Please check LAKEXPRESS_PATH.",
+                text="Error: LakeXpress server failed to initialize. Please check LAKEXPRESS_PATH.",
+            )
+        ]
+
+    if command_builder.preview_only:
+        return [
+            TextContent(
+                type="text",
+                text=(
+                    f"Server is in preview-only mode (binary not found at {LAKEXPRESS_PATH}). "
+                    "Install the binary from https://arpe.io to enable execution."
+                ),
             )
         ]
 
@@ -1256,8 +1530,8 @@ async def handle_get_version(arguments: Dict[str, Any]) -> list[TextContent]:
             TextContent(
                 type="text",
                 text=(
-                    "Error: LakeXpress binary not found or not accessible.\n"
-                    f"Expected location: {LAKEXPRESS_PATH}\n"
+                    "Error: LakeXpress server failed to initialize.\n"
+                    f"Expected binary location: {LAKEXPRESS_PATH}\n"
                     "Please set LAKEXPRESS_PATH environment variable correctly."
                 ),
             )
@@ -1269,10 +1543,26 @@ async def handle_get_version(arguments: Dict[str, Any]) -> list[TextContent]:
     response = [
         "# LakeXpress Version Information",
         "",
-        f"**Version**: {version_info['version'] or 'Unknown'}",
-        f"**Detected**: {'Yes' if version_info['detected'] else 'No'}",
-        f"**Binary Path**: {version_info['binary_path']}",
-        "",
+    ]
+
+    if version_info.get("preview_only"):
+        response += [
+            "**Mode**: Preview-only (binary not found)",
+            f"**Binary Path**: {version_info['binary_path']}",
+            f"**Message**: {version_info.get('message', '')}",
+            "",
+            "Capabilities below are based on the latest known version.",
+            "",
+        ]
+    else:
+        response += [
+            f"**Version**: {version_info['version'] or 'Unknown'}",
+            f"**Detected**: {'Yes' if version_info['detected'] else 'No'}",
+            f"**Binary Path**: {version_info['binary_path']}",
+            "",
+        ]
+
+    response += [
         "## Supported Source Databases:",
         ", ".join(f"`{d}`" for d in caps["source_databases"]),
         "",
@@ -1293,6 +1583,11 @@ async def handle_get_version(arguments: Dict[str, Any]) -> list[TextContent]:
         f"- Version Flag: {'Yes' if caps['supports_version_flag'] else 'No'}",
         f"- Incremental: {'Yes' if caps['supports_incremental'] else 'No'}",
         f"- Cleanup: {'Yes' if caps['supports_cleanup'] else 'No'}",
+        f"- Quiet FastBCP: {'Yes' if caps['supports_quiet_fbcp'] else 'No'}",
+        f"- No Progress: {'Yes' if caps['supports_no_progress'] else 'No'}",
+        f"- Resume: {'Yes' if caps['supports_resume'] else 'No'}",
+        f"- License: {'Yes' if caps['supports_license'] else 'No'}",
+        f"- Env Name: {'Yes' if caps['supports_env_name'] else 'No'}",
     ]
 
     return [TextContent(type="text", text="\n".join(response))]
@@ -1303,39 +1598,43 @@ def _build_command_explanation(request: LakeXpressRequest) -> str:
     cmd = request.command
     parts = []
 
-    if cmd == CommandType.LOGDB_INIT:
+    if cmd in (CommandType.LOGDB_INIT, CommandType.LXDB_INIT):
         parts.append("Initialize the log database schema")
         parts.append("This creates the required tables for LakeXpress sync management")
 
-    elif cmd == CommandType.LOGDB_DROP:
+    elif cmd in (CommandType.LOGDB_DROP, CommandType.LXDB_DROP):
         parts.append("Drop the log database schema")
         parts.append(
             "WARNING: This will permanently delete all sync history and configuration"
         )
-        if request.logdb_drop and request.logdb_drop.confirm:
+        drop_params = request.logdb_drop or request.lxdb_drop
+        if drop_params and drop_params.confirm:
             parts.append("Confirmation flag is set — operation will proceed")
 
-    elif cmd == CommandType.LOGDB_TRUNCATE:
+    elif cmd in (CommandType.LOGDB_TRUNCATE, CommandType.LXDB_TRUNCATE):
         parts.append("Clear all data from the log database while keeping the schema")
-        if request.logdb_truncate and request.logdb_truncate.sync_id:
+        truncate_params = request.logdb_truncate or request.lxdb_truncate
+        if truncate_params and truncate_params.sync_id:
             parts.append(
-                f"Only data for sync_id '{request.logdb_truncate.sync_id}' will be cleared"
+                f"Only data for sync_id '{truncate_params.sync_id}' will be cleared"
             )
 
-    elif cmd == CommandType.LOGDB_LOCKS:
+    elif cmd in (CommandType.LOGDB_LOCKS, CommandType.LXDB_LOCKS):
         parts.append("Show currently locked tables in the log database")
-        if request.logdb_locks and request.logdb_locks.sync_id:
-            parts.append(f"Filtering by sync_id: {request.logdb_locks.sync_id}")
+        locks_params = request.logdb_locks or request.lxdb_locks
+        if locks_params and locks_params.sync_id:
+            parts.append(f"Filtering by sync_id: {locks_params.sync_id}")
 
-    elif cmd == CommandType.LOGDB_RELEASE_LOCKS:
+    elif cmd in (CommandType.LOGDB_RELEASE_LOCKS, CommandType.LXDB_RELEASE_LOCKS):
         parts.append("Release stale or stuck table locks")
-        if request.logdb_release_locks:
-            if request.logdb_release_locks.max_age_hours is not None:
+        release_params = request.logdb_release_locks or request.lxdb_release_locks
+        if release_params:
+            if release_params.max_age_hours is not None:
                 parts.append(
-                    f"Only locks older than {request.logdb_release_locks.max_age_hours} hours"
+                    f"Only locks older than {release_params.max_age_hours} hours"
                 )
-            if request.logdb_release_locks.table_id:
-                parts.append(f"For table_id: {request.logdb_release_locks.table_id}")
+            if release_params.table_id:
+                parts.append(f"For table_id: {release_params.table_id}")
 
     elif cmd == CommandType.CONFIG_CREATE:
         p = request.config_create

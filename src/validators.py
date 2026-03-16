@@ -19,6 +19,11 @@ class CommandType(str, Enum):
     LOGDB_TRUNCATE = "logdb_truncate"
     LOGDB_LOCKS = "logdb_locks"
     LOGDB_RELEASE_LOCKS = "logdb_release_locks"
+    LXDB_INIT = "lxdb_init"
+    LXDB_DROP = "lxdb_drop"
+    LXDB_TRUNCATE = "lxdb_truncate"
+    LXDB_LOCKS = "lxdb_locks"
+    LXDB_RELEASE_LOCKS = "lxdb_release_locks"
     CONFIG_CREATE = "config_create"
     CONFIG_DELETE = "config_delete"
     CONFIG_LIST = "config_list"
@@ -129,6 +134,7 @@ class GlobalOptions(BaseModel):
     log_dir: Optional[str] = Field(None, description="Directory for log files")
     no_progress: bool = Field(False, description="Disable progress bar display")
     no_banner: bool = Field(False, description="Suppress the startup banner")
+    license: Optional[str] = Field(None, description="Path to license file (0.3.0+)")
 
 
 class LogdbInitParams(GlobalOptions):
@@ -323,6 +329,10 @@ class SyncParams(BaseModel):
     no_progress: bool = Field(False, description="Disable progress bar display")
     no_banner: bool = Field(False, description="Suppress the startup banner")
     quiet_fbcp: bool = Field(False, description="Suppress FastBCP output")
+    license: Optional[str] = Field(None, description="Path to license file (0.3.0+)")
+    env_name: Optional[str] = Field(
+        None, description="Environment name for configuration isolation (0.3.0+)"
+    )
 
 
 class SyncExportParams(BaseModel):
@@ -338,6 +348,10 @@ class SyncExportParams(BaseModel):
     no_progress: bool = Field(False, description="Disable progress bar display")
     no_banner: bool = Field(False, description="Suppress the startup banner")
     quiet_fbcp: bool = Field(False, description="Suppress FastBCP output")
+    license: Optional[str] = Field(None, description="Path to license file (0.3.0+)")
+    env_name: Optional[str] = Field(
+        None, description="Environment name for configuration isolation (0.3.0+)"
+    )
 
 
 class SyncPublishParams(BaseModel):
@@ -350,6 +364,10 @@ class SyncPublishParams(BaseModel):
     log_dir: Optional[str] = Field(None, description="Directory for log files")
     no_progress: bool = Field(False, description="Disable progress bar display")
     no_banner: bool = Field(False, description="Suppress the startup banner")
+    license: Optional[str] = Field(None, description="Path to license file (0.3.0+)")
+    env_name: Optional[str] = Field(
+        None, description="Environment name for configuration isolation (0.3.0+)"
+    )
 
 
 class RunParams(BaseModel):
@@ -366,6 +384,10 @@ class RunParams(BaseModel):
     log_dir: Optional[str] = Field(None, description="Directory for log files")
     no_progress: bool = Field(False, description="Disable progress bar display")
     no_banner: bool = Field(False, description="Suppress the startup banner")
+    license: Optional[str] = Field(None, description="Path to license file (0.3.0+)")
+    env_name: Optional[str] = Field(
+        None, description="Environment name for configuration isolation (0.3.0+)"
+    )
 
 
 class StatusParams(GlobalOptions):
@@ -415,6 +437,21 @@ class LakeXpressRequest(BaseModel):
     logdb_release_locks: Optional[LogdbReleaseLocksParams] = Field(
         None, description="Parameters for logdb release-locks"
     )
+    lxdb_init: Optional[LogdbInitParams] = Field(
+        None, description="Parameters for lxdb init (0.3.0+)"
+    )
+    lxdb_drop: Optional[LogdbDropParams] = Field(
+        None, description="Parameters for lxdb drop (0.3.0+)"
+    )
+    lxdb_truncate: Optional[LogdbTruncateParams] = Field(
+        None, description="Parameters for lxdb truncate (0.3.0+)"
+    )
+    lxdb_locks: Optional[LogdbLocksParams] = Field(
+        None, description="Parameters for lxdb locks (0.3.0+)"
+    )
+    lxdb_release_locks: Optional[LogdbReleaseLocksParams] = Field(
+        None, description="Parameters for lxdb release-locks (0.3.0+)"
+    )
     config_create: Optional[ConfigCreateParams] = Field(
         None, description="Parameters for config create"
     )
@@ -444,6 +481,11 @@ class LakeXpressRequest(BaseModel):
             CommandType.LOGDB_TRUNCATE: "logdb_truncate",
             CommandType.LOGDB_LOCKS: "logdb_locks",
             CommandType.LOGDB_RELEASE_LOCKS: "logdb_release_locks",
+            CommandType.LXDB_INIT: "lxdb_init",
+            CommandType.LXDB_DROP: "lxdb_drop",
+            CommandType.LXDB_TRUNCATE: "lxdb_truncate",
+            CommandType.LXDB_LOCKS: "lxdb_locks",
+            CommandType.LXDB_RELEASE_LOCKS: "lxdb_release_locks",
             CommandType.CONFIG_CREATE: "config_create",
             CommandType.CONFIG_DELETE: "config_delete",
             CommandType.CONFIG_LIST: "config_list",

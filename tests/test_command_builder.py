@@ -79,20 +79,18 @@ class TestCommandBuilder:
         assert builder.binary_path == Path(mock_binary)
 
     def test_init_with_nonexistent_binary(self):
-        """Test initialization with nonexistent binary fails."""
-        with pytest.raises(LakeXpressError) as exc_info:
-            CommandBuilder("/nonexistent/path/LakeXpress")
-        assert "not found" in str(exc_info.value)
+        """Test initialization with nonexistent binary enters preview-only mode."""
+        builder = CommandBuilder("/nonexistent/path/LakeXpress")
+        assert builder._preview_only is True
 
     def test_init_with_non_executable_binary(self, tmp_path):
-        """Test initialization with non-executable binary fails."""
+        """Test initialization with non-executable binary enters preview-only mode."""
         binary = tmp_path / "LakeXpress"
         binary.write_text("not executable")
         binary.chmod(0o644)
 
-        with pytest.raises(LakeXpressError) as exc_info:
-            CommandBuilder(str(binary))
-        assert "not executable" in str(exc_info.value)
+        builder = CommandBuilder(str(binary))
+        assert builder._preview_only is True
 
     def test_build_logdb_init(self, command_builder):
         """Test building logdb init command."""
@@ -599,7 +597,7 @@ class TestHelperFunctions:
         assert len(caps["Storage Backends"]) == 6
         assert len(caps["Publishing Targets"]) == 7
         assert len(caps["Compression Types"]) == 5
-        assert len(caps["Commands"]) == 14
+        assert len(caps["Commands"]) == 19
 
     def test_get_supported_capabilities_includes_saphana(self):
         """Test that SAP HANA appears in get_supported_capabilities output."""
