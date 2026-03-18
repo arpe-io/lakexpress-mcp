@@ -60,8 +60,7 @@ class CommandBuilder:
             # latest known capabilities when detect() returns None.
             self._version_detector = VersionDetector(str(self.binary_path))
             logger.info(
-                "LakeXpress running in preview-only mode "
-                "(binary not found, command preview and info tools still available)"
+                "Running in command builder mode (binary not configured)"
             )
         else:
             self._version_detector = VersionDetector(str(self.binary_path))
@@ -95,7 +94,7 @@ class CommandBuilder:
                 "detected": False,
                 "preview_only": True,
                 "binary_path": str(self.binary_path),
-                "message": "Binary not found. Install from https://arpe.io",
+                "message": "Set binary path to enable execution. Download from https://arpe.io",
                 "capabilities": {
                     "source_databases": sorted(caps.source_databases),
                     "log_databases": sorted(caps.log_databases),
@@ -151,24 +150,24 @@ class CommandBuilder:
         """
         if not self.binary_path.exists():
             logger.warning(
-                f"LakeXpress binary not found at: {self.binary_path} "
-                "- entering preview-only mode"
+                f"LakeXpress binary not found at: {self.binary_path}. "
+                "Set binary path to enable execution. Download from https://arpe.io"
             )
             self._preview_only = True
             return
 
         if not self.binary_path.is_file():
             logger.warning(
-                f"LakeXpress path is not a file: {self.binary_path} "
-                "- entering preview-only mode"
+                f"LakeXpress path is not a file: {self.binary_path}. "
+                "Set binary path to enable execution. Download from https://arpe.io"
             )
             self._preview_only = True
             return
 
         if not os.access(self.binary_path, os.X_OK):
             logger.warning(
-                f"LakeXpress binary is not executable: {self.binary_path} "
-                "- entering preview-only mode"
+                f"LakeXpress binary is not executable: {self.binary_path}. "
+                "Set binary path to enable execution. Download from https://arpe.io"
             )
             self._preview_only = True
             return
@@ -547,40 +546,42 @@ class CommandBuilder:
             cmd.append("--dry-run")
         return cmd
 
-    def format_command_display(self, command: List[str]) -> str:
+    def format_command_display(self, command: List[str], os_type: str = "linux") -> str:
         """
         Format command for display.
 
         Args:
             command: Command list
+            os_type: Target operating system for command formatting ("linux" or "windows")
 
         Returns:
             Formatted command string
         """
-        # Format for readability
-        formatted_parts = [command[0]]  # Binary path
+        # Adjust binary path for Windows
+        if os_type == "windows":
+            binary = command[0].replace("/", "\\")
+            if not binary.endswith(".exe"):
+                binary += ".exe"
+            formatted_parts = [binary]
+        else:
+            formatted_parts = [command[0]]
 
         i = 1
         while i < len(command):
-            if i < len(command) - 1 and command[i].startswith("-"):
-                # Check if next item is a value (not another flag)
-                next_item = command[i + 1]
-                if not next_item.startswith("-"):
-                    param = command[i]
-                    value = next_item
-                    # Quote values that might contain spaces
-                    if " " in value:
-                        formatted_parts.append(f'{param} "{value}"')
-                    else:
-                        formatted_parts.append(f"{param} {value}")
-                    i += 2
+            if i < len(command) - 1 and command[i].startswith("-") and not command[i + 1].startswith("-"):
+                param = command[i]
+                value = command[i + 1]
+                if " " in value:
+                    formatted_parts.append(f'{param} "{value}"')
                 else:
-                    formatted_parts.append(command[i])
-                    i += 1
+                    formatted_parts.append(f"{param} {value}")
+                i += 2
             else:
                 formatted_parts.append(command[i])
                 i += 1
 
+        if os_type == "windows":
+            return " ^\n  ".join(formatted_parts)
         return " \\\n  ".join(formatted_parts)
 
     def execute_command(
@@ -603,8 +604,7 @@ class CommandBuilder:
         """
         if self._preview_only:
             raise LakeXpressError(
-                f"Server is in preview-only mode (binary not found at {self.binary_path}). "
-                "Install the binary from https://arpe.io to enable execution."
+                "Execution requires the binary. Download from https://arpe.io and configure the binary path."
             )
 
         start_time = datetime.now()

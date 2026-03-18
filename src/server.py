@@ -79,10 +79,10 @@ try:
     command_builder = CommandBuilder(LAKEXPRESS_PATH)
     version_info = command_builder.get_version()
     if command_builder.preview_only:
-        logger.warning(
-            "LakeXpress server started in PREVIEW-ONLY mode. "
-            "Preview and informational tools are available, but execution is disabled. "
-            "Install the binary from https://arpe.io to enable execution."
+        logger.info(
+            f"LakeXpress binary not configured (path: {LAKEXPRESS_PATH}). "
+            "Command building and preview tools are available. "
+            "Download from https://arpe.io and set LAKEXPRESS_PATH to enable execution."
         )
     else:
         logger.info(f"LakeXpress binary found at: {LAKEXPRESS_PATH}")
@@ -1047,6 +1047,12 @@ async def list_tools() -> list[Tool]:
                         },
                         "required": ["auth_file", "log_db_auth_id", "sync_id"],
                     },
+                    "os_type": {
+                        "type": "string",
+                        "enum": ["linux", "windows"],
+                        "description": "Target operating system for command formatting",
+                        "default": "linux",
+                    },
                 },
                 "required": ["command"],
             },
@@ -1178,6 +1184,9 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
         ]
 
     try:
+        # Extract os_type before passing to LakeXpressRequest (not part of the model)
+        os_type = arguments.pop("os_type", "linux")
+
         # Auto-fill fastbcp_dir_path from env var if not explicitly provided
         if FASTBCP_DIR_PATH:
             for key in ("config_create", "sync", "sync_export"):
@@ -1202,7 +1211,7 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
         command = command_builder.build_command(request)
 
         # Format for display
-        display_command = command_builder.format_command_display(command)
+        display_command = command_builder.format_command_display(command, os_type=os_type)
 
         # Create explanation
         explanation = _build_command_explanation(request)
@@ -1215,9 +1224,8 @@ async def handle_preview_command(arguments: Dict[str, Any]) -> list[TextContent]
 
         if command_builder.preview_only:
             response += [
-                "**NOTE: Server is in preview-only mode** (binary not found at "
-                f"`{LAKEXPRESS_PATH}`). Command preview is available but execution "
-                "is disabled. Install the binary from https://arpe.io to enable execution.",
+                "**NOTE: Execution is not available (binary not configured).** "
+                "Download from https://arpe.io to enable execution.",
                 "",
             ]
 
@@ -1283,8 +1291,8 @@ async def handle_execute_command(arguments: Dict[str, Any]) -> list[TextContent]
             TextContent(
                 type="text",
                 text=(
-                    f"Server is in preview-only mode (binary not found at {LAKEXPRESS_PATH}). "
-                    "Install the binary from https://arpe.io to enable execution."
+                    "Execution requires the LakeXpress binary. "
+                    "Download from https://arpe.io and set LAKEXPRESS_PATH."
                 ),
             )
         ]
@@ -1547,7 +1555,7 @@ async def handle_get_version(arguments: Dict[str, Any]) -> list[TextContent]:
 
     if version_info.get("preview_only"):
         response += [
-            "**Mode**: Preview-only (binary not found)",
+            "**Mode**: Command builder (execution not available)",
             f"**Binary Path**: {version_info['binary_path']}",
             f"**Message**: {version_info.get('message', '')}",
             "",
